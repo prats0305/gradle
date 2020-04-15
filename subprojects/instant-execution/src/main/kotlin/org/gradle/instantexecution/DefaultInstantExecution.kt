@@ -17,6 +17,7 @@
 package org.gradle.instantexecution
 
 import org.gradle.api.Project
+import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.project.ProjectStateRegistry
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.logging.LogLevel
@@ -48,6 +49,7 @@ import org.gradle.instantexecution.serialization.writeCollection
 import org.gradle.instantexecution.serialization.writeFile
 import org.gradle.internal.Factory
 import org.gradle.internal.build.event.BuildEventListenerRegistryInternal
+import org.gradle.internal.cleanup.BuildOutputCleanupRegistryInternal
 import org.gradle.internal.operations.BuildOperationExecutor
 import org.gradle.internal.serialize.Decoder
 import org.gradle.internal.serialize.Encoder
@@ -356,6 +358,8 @@ class DefaultInstantExecution internal constructor(
             }
             val eventListenerRegistry = service<BuildEventListenerRegistryInternal>()
             writeCollection(eventListenerRegistry.subscriptions)
+            val buildOutputCleanupRegistry = service<BuildOutputCleanupRegistryInternal>()
+            writeCollection(buildOutputCleanupRegistry.registeredOutputs)
         }
     }
 
@@ -366,6 +370,11 @@ class DefaultInstantExecution internal constructor(
             readCollection {
                 val provider = readNonNull<Provider<OperationCompletionListener>>()
                 eventListenerRegistry.subscribe(provider)
+            }
+            val buildOutputCleanupRegistry = service<BuildOutputCleanupRegistryInternal>()
+            readCollection {
+                val files = readNonNull() as FileCollection
+                buildOutputCleanupRegistry.registerOutputs(files)
             }
         }
     }
