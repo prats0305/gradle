@@ -90,6 +90,18 @@ fun FileSystemOperations.removeTransformDir(cachesDir: File) {
 }
 
 
+fun FileSystemOperations.removeJarsDir(cachesDir: File) {
+    if (cachesDir.isDirectory) {
+        cachesDir.listFiles()
+            .filter { it.isDirectory && it.name == "jars-4" }
+            .forEach { jarsDir ->
+                println("Removing jars directory : $jarsDir")
+                delete { delete(jarsDir) }
+            }
+    }
+}
+
+
 private
 val scriptCacheDirNames =
     listOf("scripts", "scripts-remapped", "gradle-kotlin-dsl", "gradle-kotlin-dsl-accessors")
