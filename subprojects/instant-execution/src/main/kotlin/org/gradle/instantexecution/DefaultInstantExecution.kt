@@ -373,7 +373,7 @@ class DefaultInstantExecution internal constructor(
             }
             val buildOutputCleanupRegistry = service<BuildOutputCleanupRegistryInternal>()
             readCollection {
-                val files = readNonNull() as FileCollection
+                val files = readNonNull<FileCollection>()
                 buildOutputCleanupRegistry.registerOutputs(files)
             }
         }
